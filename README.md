@@ -1,6 +1,6 @@
 # mect_1ano
-1º Ano de MECT na UA
-1º Semestre do 4º Ano
+<h3> 1º Ano de MECT na UA <\h3>
+<h2> 1º Semestre do 4º Ano <\h2>
 -Arquiteturas de Alto Desempenho (AAD)
 -Informação e Codificação (IC) 
 -Comunicações Móveis (CM) 
