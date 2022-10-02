@@ -1,0 +1,74 @@
+Sep 29 14:25:38.377 HYPERVISOR: Release 0.2.22-amd64/Linux (tag 2022052400)
+Sep 29 14:25:38.377 HYPERVISOR: Started on IP = localhost, TCP port = 34371.
+Sep 29 14:25:38.387 HYPERVISOR: exec_cmd: hypervisor version 
+Sep 29 14:25:38.388 HYPERVISOR: exec_cmd: hypervisor working_dir /home/tiago/Desktop/Uni/4ANO/AC/Pratica2/project/project-files/dynamips 
+Sep 29 14:25:38.388 GENERAL: working_dir=/home/tiago/Desktop/Uni/4ANO/AC/Pratica2/project/project-files/dynamips
+Sep 29 14:25:38.388 HYPERVISOR: exec_cmd: hypervisor working_dir /home/tiago/Desktop/Uni/4ANO/AC/Pratica2/project/project-files/dynamips/22207173-c2ff-41df-8108-3d2dff479917 
+Sep 29 14:25:38.388 GENERAL: working_dir=/home/tiago/Desktop/Uni/4ANO/AC/Pratica2/project/project-files/dynamips/22207173-c2ff-41df-8108-3d2dff479917
+Sep 29 14:25:38.388 HYPERVISOR: exec_cmd: vm create R2 2 c7200 
+Sep 29 14:25:38.388 VM: VM R2 created.
+Sep 29 14:25:38.389 HYPERVISOR: exec_cmd: vm set_con_tcp_port R2 5001 
+Sep 29 14:25:38.389 HYPERVISOR: exec_cmd: c7200 get_mac_addr R2 
+Sep 29 14:25:38.390 HYPERVISOR: exec_cmd: vm get_status R2 
+Sep 29 14:25:38.390 HYPERVISOR: exec_cmd: vm slot_add_binding R2 0 0 C7200-IO-FE 
+Sep 29 14:25:38.390 HYPERVISOR: exec_cmd: vm set_disk0 R2 0 
+Sep 29 14:25:38.391 HYPERVISOR: exec_cmd: vm get_status R2 
+Sep 29 14:25:38.391 HYPERVISOR: exec_cmd: vm set_idle_pc R2 0x62cc930c 
+Sep 29 14:25:38.392 HYPERVISOR: exec_cmd: vm set_ios R2 /home/tiago/GNS3/images/IOS/c7200-advipservicesk9-mz.152-4.S5.image 
+Sep 29 14:25:38.393 HYPERVISOR: exec_cmd: c7200 set_mac_addr R2 ca02.601d.0000 
+Sep 29 14:25:38.393 HYPERVISOR: exec_cmd: vm set_nvram R2 512 
+Sep 29 14:25:38.393 HYPERVISOR: exec_cmd: vm set_ram R2 512 
+Sep 29 14:25:38.393 HYPERVISOR: exec_cmd: vm get_status R2 
+Sep 29 14:25:38.393 HYPERVISOR: exec_cmd: vm slot_remove_binding R2 0 0 
+Sep 29 14:25:38.394 HYPERVISOR: exec_cmd: vm get_status R2 
+Sep 29 14:25:38.394 HYPERVISOR: exec_cmd: vm slot_add_binding R2 0 0 C7200-IO-2FE 
+Sep 29 14:25:38.394 HYPERVISOR: exec_cmd: vm get_status R2 
+Sep 29 14:25:38.394 HYPERVISOR: exec_cmd: vm slot_add_binding R2 1 0 PA-2FE-TX 
+Sep 29 14:26:42.527 HYPERVISOR: exec_cmd: nio create_udp udp-dbd4993a-49c7-4a73-bf2d-57822abab6f8 10014 127.0.0.1 10015 
+Sep 29 14:26:42.740 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R2 0 0 udp-dbd4993a-49c7-4a73-bf2d-57822abab6f8 
+Sep 29 14:26:42.741 HYPERVISOR: exec_cmd: vm get_status R2 
+Sep 29 14:26:49.855 HYPERVISOR: exec_cmd: nio create_udp udp-26bf7fb8-0209-46b2-8cf3-13a3f6ee17d1 10018 127.0.0.1 10019 
+Sep 29 14:26:49.856 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R2 0 1 udp-26bf7fb8-0209-46b2-8cf3-13a3f6ee17d1 
+Sep 29 14:26:49.857 HYPERVISOR: exec_cmd: vm get_status R2 
+Sep 29 14:27:13.536 HYPERVISOR: exec_cmd: vm set_ios R2 /home/tiago/GNS3/images/IOS/c7200-advipservicesk9-mz.152-4.S5.image 
+Sep 29 14:27:33.491 HYPERVISOR: exec_cmd: vm create Ghost 0 c7200 
+Sep 29 14:27:33.496 VM: VM Ghost created.
+Sep 29 14:27:33.499 HYPERVISOR: exec_cmd: vm set_ios Ghost /home/tiago/GNS3/images/IOS/c7200-advipservicesk9-mz.152-4.S5.image 
+Sep 29 14:27:33.500 HYPERVISOR: exec_cmd: vm set_ghost_status Ghost 1 
+Sep 29 14:27:33.500 HYPERVISOR: exec_cmd: vm set_ghost_file Ghost /home/tiago/Desktop/Uni/4ANO/AC/Pratica2/project/project-files/dynamips/c7200-advipservicesk9-mz.152-4.S5.image-512.ghost 
+Sep 29 14:27:33.509 HYPERVISOR: exec_cmd: vm set_ram Ghost 512 
+Sep 29 14:27:33.509 HYPERVISOR: exec_cmd: vm get_status Ghost 
+Sep 29 14:27:33.510 HYPERVISOR: exec_cmd: vm set_config Ghost configs/i0_startup-config.cfg 
+Sep 29 14:27:33.515 HYPERVISOR: exec_cmd: vm start Ghost 
+Sep 29 14:27:33.847 HYPERVISOR: exec_cmd: vm get_status Ghost 
+Sep 29 14:27:33.847 HYPERVISOR: exec_cmd: vm stop Ghost 
+Sep 29 14:27:33.954 VM: VM Ghost shutdown.
+Sep 29 14:27:33.957 HYPERVISOR: exec_cmd: vm extract_config Ghost 
+Sep 29 14:27:33.958 HYPERVISOR: exec_cmd: vm clean_delete Ghost 
+Sep 29 14:27:33.959 VM: VM Ghost destroyed.
+Sep 29 14:27:33.963 HYPERVISOR: exec_cmd: vm set_ghost_status R2 2 
+Sep 29 14:27:33.963 HYPERVISOR: exec_cmd: vm set_ghost_file R2 /home/tiago/Desktop/Uni/4ANO/AC/Pratica2/project/project-files/dynamips/c7200-advipservicesk9-mz.152-4.S5.image-512.ghost 
+Sep 29 14:27:33.963 HYPERVISOR: exec_cmd: vm get_status R2 
+Sep 29 14:27:33.964 HYPERVISOR: exec_cmd: vm set_config R2 configs/i2_startup-config.cfg 
+Sep 29 14:27:33.964 HYPERVISOR: exec_cmd: vm start R2 
+Sep 29 14:28:04.208 HYPERVISOR: exec_cmd: vm extract_config R2 
+Sep 29 14:35:34.221 HYPERVISOR: exec_cmd: vm extract_config R2 
+Sep 29 14:39:34.230 HYPERVISOR: exec_cmd: vm extract_config R2 
+Sep 29 14:41:34.238 HYPERVISOR: exec_cmd: vm extract_config R2 
+Sep 29 14:42:08.245 HYPERVISOR: exec_cmd: nio bind_filter udp-26bf7fb8-0209-46b2-8cf3-13a3f6ee17d1 2 capture 
+Sep 29 14:42:08.250 HYPERVISOR: exec_cmd: nio setup_filter udp-26bf7fb8-0209-46b2-8cf3-13a3f6ee17d1 2 en10mb /home/tiago/Desktop/Uni/4ANO/AC/Pratica2/project/project-files/captures/R2_FastEthernet01_to_PC1_Ethernet0.pcap 
+Sep 29 14:43:40.701 HYPERVISOR: exec_cmd: nio unbind_filter udp-26bf7fb8-0209-46b2-8cf3-13a3f6ee17d1 2 
+Sep 29 14:43:43.883 HYPERVISOR: exec_cmd: nio bind_filter udp-26bf7fb8-0209-46b2-8cf3-13a3f6ee17d1 2 capture 
+Sep 29 14:43:43.883 HYPERVISOR: exec_cmd: nio setup_filter udp-26bf7fb8-0209-46b2-8cf3-13a3f6ee17d1 2 en10mb /home/tiago/Desktop/Uni/4ANO/AC/Pratica2/project/project-files/captures/R2_FastEthernet01_to_PC1_Ethernet0.pcap 
+Sep 29 14:43:59.079 HYPERVISOR: exec_cmd: vm get_status R2 
+Sep 29 14:43:59.081 HYPERVISOR: exec_cmd: vm stop R2 
+Sep 29 14:43:59.141 VM: VM R2 shutdown.
+Sep 29 14:43:59.141 HYPERVISOR: exec_cmd: vm extract_config R2 
+Sep 29 14:43:59.150 HYPERVISOR: exec_cmd: nio unbind_filter udp-26bf7fb8-0209-46b2-8cf3-13a3f6ee17d1 2 
+Sep 29 14:44:39.114 HYPERVISOR: exec_cmd: vm get_status R2 
+Sep 29 14:44:39.115 HYPERVISOR: exec_cmd: vm extract_config R2 
+Sep 29 14:44:39.115 HYPERVISOR: exec_cmd: vm delete R2 
+Sep 29 14:44:39.116 VM: VM R2 destroyed.
+Sep 29 14:44:39.116 HYPERVISOR: exec_cmd: hypervisor stop 
+Sep 29 14:44:39.538 HYPERVISOR: Stopped.
+Sep 29 14:44:39.538 GENERAL: reset done.

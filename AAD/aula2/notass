@@ -1,0 +1,10 @@
+media aritmetica (simples) = SOM(Ai) / nº elementos
+
+media aritmetica (ponderada) = SOM(Ai * pi) 
+(aka com 'pesos') 
+
+media geometrica (simples) = RAIZ_INDICE(N) [PROD(Ai)]
+media geometrica (ponderada) = RAIZ_INDICE(N) [PROD(Ai) * pi]
+Σ
+
+
