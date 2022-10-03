@@ -10,6 +10,8 @@
 class WAVHist {
   private:
 	std::vector<std::map<short, size_t>> counts;
+	std::map<short, size_t> MID_channel;
+	std::map<short, size_t> SIDE_channel;
 
 
   public:
@@ -19,34 +21,28 @@ class WAVHist {
 
 	void update(const std::vector<short>& samples) {
 		size_t n { };
-		for(auto s : samples)
-		 	counts[n++ % counts.size()][s]++;
-		
-		std::map<short, size_t> MID;
-		std::map<short, size_t> SIDE;
 		short aux { 0 };
-		n=0;
 		for(auto s : samples){
-			if(n%2 == 0){
+		 	if(n%2 == 0){
 				aux = s;
 			}else{	
 				//print aux and s
 				//std::cout << aux << " " << s << " MID:" <<(aux+s)/2 << " SIDE: "<< (aux-s)/2 << std::endl;
-				MID[(aux+s)/2]++;
-				SIDE[(aux-s)/2]++;
+				MID_channel[short((aux+s)/2)]++;
+				SIDE_channel[short((aux-s)/2)]++;
 			}
-			n++;
+			counts[n++ % counts.size()][aux]++;
 		}
 
 	    //MID CHANNEL
 		std::ofstream out_file("MID_channel.txt");
-		for(auto [value, counter] : MID)
+		for(auto [value, counter] : MID_channel)
 			out_file << value << '\t' << counter << '\n';
 		out_file.close();
 
 		//SIDE CHANNEL
 		std::ofstream out_file2("SIDE_channel.txt");
-		for(auto [value, counter] : SIDE)
+		for(auto [value, counter] : SIDE_channel)
 			out_file2 << value << '\t' << counter << '\n';
 	}
 
@@ -55,31 +51,6 @@ class WAVHist {
 			std::cout << value << '\t' << counter << '\n';
 	}
 
-	// void MID_channel() {
-	// 	std::map<short, size_t> hist { counts[0] };
-	// 	for(auto [value, counter] : counts[1])
-	// 		hist[value] += counter;
-
-	// 	std::ofstream out_file("MID_channel.txt");
-	// 	for(auto [value, counter] : hist)
-	// 		out_file << value << '\t' << counter << '\n';
-
-	// 	out_file.close();
-		
-	// }
-
-	// void SIDE_channel() {
-	// 	std::map<short, size_t> hist { counts[0] };
-	// 	for(auto [value, counter] : counts[1])
-	// 		hist[value] -= counter;
-
-	// 	std::ofstream out_file("SIDE_channel.txt");
-	// 	for(auto [value, counter] : hist)
-	// 		out_file << value << '\t' << counter << '\n';
-
-	// 	out_file.close();
-		
-	// }
 };
 
 #endif 

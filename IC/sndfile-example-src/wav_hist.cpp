@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 		hist.update(samples);
 	}
 
-	//hist.dump(channel);
+	hist.dump(channel);
 	return 0;
 }
 
