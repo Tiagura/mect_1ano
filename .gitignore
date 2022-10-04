@@ -327,9 +327,13 @@ pip-selfcheck.json
 .vscode/*.code-snippets
 
 # Ignore code-workspaces
+
 *.code-workspace
 
 # Ignore virtual machines .0va
 *.ova
+
+# Ignore some subjects files
+DLX/*
 
 # End of https://www.toptal.com/developers/gitignore/api/python,java,c++,c,cmake,linux,visualstudiocode,venv
