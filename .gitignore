@@ -331,7 +331,7 @@ pip-selfcheck.json
 
 *.code-workspace
 
-# Ignore virtual machines .0va
+# Ignore virtual machines .ova
 *.ova
 
 # Ignore some subjects files
