@@ -45,10 +45,6 @@ class WAVQuant {
                 new_quant[i++] = s << bit_cut;
             }
             
-            for(size_t i = 0; i < n; i++) {
-                std::cout << quant[i] << " " << new_quant[i] << std::endl;
-                if(i==10) break;
-            }
             return new_quant;
         }
 
