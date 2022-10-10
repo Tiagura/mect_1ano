@@ -22,7 +22,7 @@ class WAVQuant {
             //copy samples to quant
             for (auto& s : samples) { 
                 quant[i++] = s >> bit_cut;
-                //std::cout << s << " " << quant.back() << std::endl;
+                //std::cout << s << " " << quant[i-1] << std::endl;
             }
 
         }

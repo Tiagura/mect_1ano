@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
 	bool verbose { false };
 
 	if(argc < 3) {
-		cerr << "Usage: wav_cp [ -v (verbose) ]\n";
+		cerr << "Usage: wav_cmp [ -v (verbose) ]\n";
 		cerr << "              wavFileIn wavFileOut\n";
 		return 1;
 	}
