@@ -35,7 +35,8 @@
 #define BOOT_ITER 10				// Number of activations for warm-up
                                     // There is an initial transient in which first activations
                                     // often have an irregular behaviour (cache issues, ..)
-
+//A3
+#define _GNU_SOURCE /* Required by sched_setaffinity */
 
 /* ***********************************************
 * Prototypes
@@ -79,7 +80,10 @@ void * Thread_1_code(void *arg)
 		
 		niter++; // Count number of activations
 		
-		/* Compute latency and jitter */		
+		/* Compute latency and jitter */	
+		if(niter == 1)
+			ta_ant = ta; // Initialization
+
 		tiat=TsSub(ta,ta_ant);  // Compute time since last activation
 		if(niter == BOOT_ITER) {	// Boot time finished. Init max/min variables	    
 			  min_iat = tiat.tv_nsec;
@@ -125,19 +129,50 @@ int main(int argc, char *argv[])
 {
 	int err;
 	pthread_t threadid;
-	char procname[40]; 
-	
+	char procname[40];
+	int priority;
 
+	
 	/* Process input args */
-	if(argc != 2) {
+	if(argc != 3) {
 	  printf("Usage: %s PROCNAME, where PROCNAME is a string\n\r", argv[0]);
 	  return -1; 
 	}
 	
 	strcpy(procname, argv[1]);
+
+	//priority = 30; //A1
+	priority = atoi(argv[2]); //A2
+	//priority must be between 1 and 99
+	if (priority < 1 || priority > 99){
+		printf("Priority must be between 1 and 99!\n");
+		return -1;
+	}
+
+	struct sched_param parm;
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
+	pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
+	parm.sched_priority = priority;
+	pthread_attr_setschedparam(&attr,&parm);
 	
+	/* A3 Variables */ 
+	cpu_set_t cpuset;
+
+	/* A3 Forces the process to execute only on CPU0 */
+	CPU_ZERO(&cpuset);
+	CPU_SET(0,&cpuset);
+	if(sched_setaffinity(0, sizeof(cpuset), &cpuset)) {
+		printf("\n Lock of process to CPU0 failed!!!");
+		return(-1);
+	}
+
+
+
 	/* Create periodic thread/task */
-	err=pthread_create(&threadid, NULL, Thread_1_code, &procname);
+	//err=pthread_create(&threadid, NULL, Thread_1_code, &procname);
+	err=pthread_create(&threadid, &attr, Thread_1_code, &procname); //A1 A2 A3
  	if(err != 0) {
 		printf("\n\r Error creating Thread [%s]", strerror(err));
 		return -1;

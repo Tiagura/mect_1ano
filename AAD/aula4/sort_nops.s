@@ -17,17 +17,26 @@ n:      .word 10
         .global main
 
 main:	addi r1, r0, n;		r1=n
-	lw r1, 0(r1); 		r1 = val(n) = 10
-	
-	addi r2, r0, array;	r2 = add(array[0])
 
+	nop;
+	nop;
+
+	lw r1, 0(r1); 		r1 = val(n) = 10
+	addi r2, r0, array;	r2 = add(array[0])
         add r3, r0, r0; 	i = 0
-        
 	addi r8, r1, -1; 	r8 = n - 1 = 9
 
+	nop;
+	nop;
+
 loop1:	slt r9, r3, r8;		r9 = r3 < r8
+
+	nop;
+	nop;
+
 	beqz r9, end
 	
+	nop;
 	nop;
 	nop;
 
@@ -38,23 +47,44 @@ loop1:	slt r9, r3, r8;		r9 = r3 < r8
 loop2:	lw r7, 0(r5);		r7 = val(values[j=1])
 
 	nop;
+	nop;
 
 	slt r9, r4, r7;
+
+	nop;
+	nop;
+
 	beqz r9, if;
 
 	nop;
 	nop;
+	nop;
+
 	add r9, r4, r0;
 	add r4, r7, r0;
 	add r7, r9, r0;
+	
+	nop;
+
 	sw 0(r2), r4;	guarda em array[i] valor de r7 (array[j])
+
+	nop;
+
 	sw 0(r5), r7;	guarda em array[j] valor de r4 (array[i])
 
 if:	addi r6, r6, 1;		r6 = j + 1
+
+	nop;
+
 	addi r5, r5, 4;		r5 = proxima posicao do array
 	slt r9, r6, r1;
+
+	nop;
+	nop;
+
 	bnez r9, loop2;
 
+	nop;
 	nop;
 	nop;
 
@@ -62,6 +92,7 @@ if:	addi r6, r6, 1;		r6 = j + 1
 	addi r2, r2, 4;		r2 = proxima posicao do array
 	j loop1;
 
+	nop;
 	nop;
 	nop;
 	

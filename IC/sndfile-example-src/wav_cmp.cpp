@@ -35,33 +35,59 @@ int main(int argc, char *argv[]) {
         cerr << "files do not have the same number of samples" << endl;
         return 1;
     }
-    
-    double N = sfhInOG.samplerate() * sfhInOG.channels();
+
+
 
 
     double D = 0, S=0;
-    size_t nFrames;
+    double maxError = 0, tmpError;
+    double N = sfhInOG.frames()*sfhInOG.channels();
+
+    size_t nFramesOG;
     vector<short> OGsamples(FRAMES_BUFFER_SIZE * sfhInOG.channels());
-    while((nFrames = sfhInOG.readf(OGsamples.data(), FRAMES_BUFFER_SIZE))) {
-        OGsamples.resize(nFrames * sfhInOG.channels());
-    }
-    // VARS 
-    double Ex = 0;
-    double Er = 0;
-	double SNR = 0;
-    vector<short> C0samples(FRAMES_BUFFER_SIZE * sfhInCO.channels());
-    while((nFrames = sfhInCO.readf(C0samples.data(), FRAMES_BUFFER_SIZE))) {
-        C0samples.resize(nFrames * sfhInCO.channels());
-        for(int j=0;j<N; j++){
-            if(j%2==0){
-                Ex = Ex + OGsamples[j]*OGsamples[j];
-                Er = Er + C0samples[j]*C0samples[j];
-            }
+
+    size_t nFramesCO;
+    vector<short> COsamples(FRAMES_BUFFER_SIZE * sfhInCO.channels());
+
+    while((nFramesOG = sfhInOG.readf(OGsamples.data(), FRAMES_BUFFER_SIZE)), (nFramesCO = sfhInCO.readf(COsamples.data(), FRAMES_BUFFER_SIZE))){
+        OGsamples.resize(nFramesOG * sfhInOG.channels());
+        COsamples.resize(nFramesOG * sfhInCO.channels());
+        //iterate samples
+        for(int i = 0; i< OGsamples.size(); ++i){
+            D += pow(OGsamples[i]-COsamples[i], 2);
+            S += pow(OGsamples[i], 2);
+            tmpError = abs(OGsamples[i] - COsamples[i]);
+            if(tmpError > maxError)
+                maxError = tmpError;
         }
-        SNR = 10 * log10((double)(Ex/Er));
+    }
+
+    D = (1/N) * D;
+    S = (1/N) * S;
+
+    //Calculating SNR (expressed in dB)
+    double SNR = 10*log10(S/D);
+    cout << "\033[1;34mSNR: " << SNR << " dB\nMaximum per sample absolute error: " << maxError << "\033[0m" << endl;
+
+
+
+    // VARS 
+    // double Ex = 0;
+    // double Er = 0;
+	// double SNR = 0;
+    // vector<short> C0samples(FRAMES_BUFFER_SIZE * sfhInCO.channels());
+    // while((nFrames = sfhInCO.readf(C0samples.data(), FRAMES_BUFFER_SIZE))) {
+    //     C0samples.resize(nFrames * sfhInCO.channels());
+    //     for(int j=0;j<N; j++){
+    //         if(j%2==0){
+    //             Ex = Ex + OGsamples[j]*OGsamples[j];
+    //             Er = Er + C0samples[j]*C0samples[j];
+    //         }
+    //     }
+    //     SNR = 10 * log10((double)(Ex/Er));
 
         
-    }
+    // }
 	
 	
     
