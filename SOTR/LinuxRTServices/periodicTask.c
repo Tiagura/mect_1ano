@@ -8,6 +8,9 @@
  *    
  *
  *****************************************************************/
+//A3
+#define _GNU_SOURCE /* Required by sched_setaffinity */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -35,8 +38,6 @@
 #define BOOT_ITER 10				// Number of activations for warm-up
                                     // There is an initial transient in which first activations
                                     // often have an irregular behaviour (cache issues, ..)
-//A3
-#define _GNU_SOURCE /* Required by sched_setaffinity */
 
 /* ***********************************************
 * Prototypes
@@ -57,8 +58,9 @@ void * Thread_1_code(void *arg)
 			ta, 		// activation time of current thread activation (absolute)
 			tiat, 		// thread inter-arrival time,
 			ta_ant, 	// activation time of last instance (absolute),
-			tp; 		// Thread period
-		
+			tp, 		// Thread period
+			tsleep;		// Time to wait before next thread activation
+
 	/* Other variables */
 	uint64_t min_iat, max_iat; // Hold the minimum/maximum observed inter arrival time
 	int niter = 0; 	// Activation counter
@@ -70,11 +72,16 @@ void * Thread_1_code(void *arg)
 	clock_gettime(CLOCK_MONOTONIC, &ts);
 	ts = TsAdd(ts,tp);	
 	
+	
+	//arg to tsleep
+	tsleep = *(struct timespec*)arg;
+
 	/* Periodic jobs ...*/ 
 	while(1) {
 
 		/* Wait until next cycle */
-		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,&ts,NULL);
+
+		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,&ts, &tsleep);
 		clock_gettime(CLOCK_MONOTONIC, &ta);		
 		ts = TsAdd(ts,tp);		
 		
@@ -131,11 +138,11 @@ int main(int argc, char *argv[])
 	pthread_t threadid;
 	char procname[40];
 	int priority;
-
+	int* periodicity;
 	
 	/* Process input args */
-	if(argc != 3) {
-	  printf("Usage: %s PROCNAME, where PROCNAME is a string\n\r", argv[0]);
+	if(argc != 4) {
+	  printf("Usage: %s PROCNAME PRIORITY PERIODICITY, \n\rwhere PROCNAME is a string, where PRIORITY [1,99]\n\rwhere PERIODICITY [50,500]ms", argv[0]);
 	  return -1; 
 	}
 	
@@ -146,6 +153,13 @@ int main(int argc, char *argv[])
 	//priority must be between 1 and 99
 	if (priority < 1 || priority > 99){
 		printf("Priority must be between 1 and 99!\n");
+		return -1;
+	}
+
+	//argv[3] must be between 50 and 500
+	*periodicity = atoi(argv[3]);
+	if (*periodicity < 50 || *periodicity > 500){
+		printf("Periodicity must be between 50 and 500 ms!\n");
 		return -1;
 	}
 
@@ -172,7 +186,7 @@ int main(int argc, char *argv[])
 
 	/* Create periodic thread/task */
 	//err=pthread_create(&threadid, NULL, Thread_1_code, &procname);
-	err=pthread_create(&threadid, &attr, Thread_1_code, &procname); //A1 A2 A3
+	err=pthread_create(&threadid, &attr, Thread_1_code((void *) periodicity), &procname); //A1 A2 A3
  	if(err != 0) {
 		printf("\n\r Error creating Thread [%s]", strerror(err));
 		return -1;
