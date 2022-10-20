@@ -1,0 +1,18 @@
+Oct 20 12:11:11.808 HYPERVISOR: Release 0.2.22-amd64/Linux (tag 2022052400)
+Oct 20 12:11:11.808 HYPERVISOR: Started on IP = localhost, TCP port = 55803.
+Oct 20 12:11:11.817 HYPERVISOR: exec_cmd: hypervisor version 
+Oct 20 12:11:11.818 HYPERVISOR: exec_cmd: hypervisor working_dir /home/tiago/Desktop/Uni/mect_1ano/AC/Pratica3/Advanced_MP_BGP/project-files/dynamips 
+Oct 20 12:11:11.818 GENERAL: working_dir=/home/tiago/Desktop/Uni/mect_1ano/AC/Pratica3/Advanced_MP_BGP/project-files/dynamips
+Oct 20 12:11:11.818 HYPERVISOR: exec_cmd: ethsw create Switch3 
+Oct 20 12:11:12.752 HYPERVISOR: exec_cmd: nio create_udp udp-5ff5432f-65a4-45c2-8ca8-34b2a49025de 10013 127.0.0.1 10012 
+Oct 20 12:11:12.752 HYPERVISOR: exec_cmd: ethsw add_nio Switch3 udp-5ff5432f-65a4-45c2-8ca8-34b2a49025de 
+Oct 20 12:11:12.770 HYPERVISOR: exec_cmd: ethsw set_access_port Switch3 udp-5ff5432f-65a4-45c2-8ca8-34b2a49025de 1 
+Oct 20 12:11:12.802 HYPERVISOR: exec_cmd: nio create_udp udp-b02d63c8-eca1-49bb-b125-48f9991f76dc 10016 127.0.0.1 10017 
+Oct 20 12:11:12.803 HYPERVISOR: exec_cmd: ethsw add_nio Switch3 udp-b02d63c8-eca1-49bb-b125-48f9991f76dc 
+Oct 20 12:11:12.810 HYPERVISOR: exec_cmd: ethsw set_access_port Switch3 udp-b02d63c8-eca1-49bb-b125-48f9991f76dc 1 
+Oct 20 13:17:48.190 HYPERVISOR: exec_cmd: nio bind_filter udp-5ff5432f-65a4-45c2-8ca8-34b2a49025de 2 capture 
+Oct 20 13:17:48.191 HYPERVISOR: exec_cmd: nio setup_filter udp-5ff5432f-65a4-45c2-8ca8-34b2a49025de 2 en10mb /home/tiago/Desktop/Uni/mect_1ano/AC/Pratica3/Advanced_MP_BGP/project-files/captures/R3_FastEthernet01_to_Switch3_Ethernet0.pcap 
+Oct 20 13:23:11.128 HYPERVISOR: exec_cmd: ethsw delete Switch3 
+Oct 20 13:23:11.158 HYPERVISOR: exec_cmd: hypervisor stop 
+Oct 20 13:23:11.634 HYPERVISOR: Stopped.
+Oct 20 13:23:11.634 GENERAL: reset done.

@@ -1,4 +1,4 @@
-/******************************************************************
+ /******************************************************************
  * Paulo Pedreiras, Sept/2022
  * DETI/UA/IT - Real-Time Operating Systems course
  *
@@ -9,7 +9,7 @@
  *
  *****************************************************************/
 //A3
-#define _GNU_SOURCE /* Required by sched_setaffinity */
+// #define _GNU_SOURCE /* Required by sched_setaffinity */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,6 +50,7 @@ struct  timespec TsSub(struct  timespec  ts1, struct  timespec  ts2);
 /* *************************
 * Thread_1 code 
 * **************************/
+int periodicity;
 
 void * Thread_1_code(void *arg)
 {
@@ -71,17 +72,16 @@ void * Thread_1_code(void *arg)
 	tp.tv_sec = PERIOD_S;	
 	clock_gettime(CLOCK_MONOTONIC, &ts);
 	ts = TsAdd(ts,tp);	
-	
-	
-	//arg to tsleep
-	tsleep = *(struct timespec*)arg;
+
+	//create timespec for periodicity
+	tsleep = (struct timespec){0 , periodicity*1000000}; //timespec gives {seconds , nanoseconds}, periocidity given in ms
 
 	/* Periodic jobs ...*/ 
 	while(1) {
 
 		/* Wait until next cycle */
-
-		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,&ts, &tsleep);
+		//clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME,&ts, NULL);
+		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &tsleep, NULL); //A2
 		clock_gettime(CLOCK_MONOTONIC, &ta);		
 		ts = TsAdd(ts,tp);		
 		
@@ -138,27 +138,44 @@ int main(int argc, char *argv[])
 	pthread_t threadid;
 	char procname[40];
 	int priority;
-	int* periodicity;
+
+	// /* A3 Variables */ 
+	// cpu_set_t cpuset;
+
+	// /* A3 Forces the process to execute only on CPU0 */
+	// CPU_ZERO(&cpuset);
 	
+	// CPU_SET(0,&cpuset);
+	// if(sched_setaffinity(0, sizeof(cpuset), &cpuset)) {
+	// 	printf("\n Lock of process to CPU0 failed!!!");
+	// 	return(-1);
+	// }
+
+
 	/* Process input args */
 	if(argc != 4) {
-	  printf("Usage: %s PROCNAME PRIORITY PERIODICITY, \n\rwhere PROCNAME is a string, where PRIORITY [1,99]\n\rwhere PERIODICITY [50,500]ms", argv[0]);
+	  printf("Usage: %s PROCNAME PRIORITY PERIODICITY\n\rwhere PROCNAME is a string\nwhere PRIORITY [1,99]\n\rwhere PERIODICITY [50,500]ms\n", argv[0]);
 	  return -1; 
 	}
+	
+	printf("Priority    -> %s\n",argv[2]);
+	printf("Periodicity -> %s\n",argv[3]);
 	
 	strcpy(procname, argv[1]);
 
 	//priority = 30; //A1
+
 	priority = atoi(argv[2]); //A2
 	//priority must be between 1 and 99
-	if (priority < 1 || priority > 99){
+	if ((priority < 1 )|| (priority > 99)){
 		printf("Priority must be between 1 and 99!\n");
 		return -1;
 	}
 
+
 	//argv[3] must be between 50 and 500
-	*periodicity = atoi(argv[3]);
-	if (*periodicity < 50 || *periodicity > 500){
+	periodicity =  atoi(argv[3]);
+	if (periodicity < 50 || periodicity > 500){
 		printf("Periodicity must be between 50 and 500 ms!\n");
 		return -1;
 	}
@@ -166,29 +183,22 @@ int main(int argc, char *argv[])
 	struct sched_param parm;
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
-	pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
+
 	pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
+
 	parm.sched_priority = priority;
 	pthread_attr_setschedparam(&attr,&parm);
+
+	pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED);
+
 	
-	/* A3 Variables */ 
-	cpu_set_t cpuset;
-
-	/* A3 Forces the process to execute only on CPU0 */
-	CPU_ZERO(&cpuset);
-	CPU_SET(0,&cpuset);
-	if(sched_setaffinity(0, sizeof(cpuset), &cpuset)) {
-		printf("\n Lock of process to CPU0 failed!!!");
-		return(-1);
-	}
-
 
 
 	/* Create periodic thread/task */
 	//err=pthread_create(&threadid, NULL, Thread_1_code, &procname);
-	err=pthread_create(&threadid, &attr, Thread_1_code((void *) periodicity), &procname); //A1 A2 A3
+	err=pthread_create(&threadid, &attr, Thread_1_code, &procname); //A1 A2 A3 
  	if(err != 0) {
-		printf("\n\r Error creating Thread [%s]", strerror(err));
+		printf("\n\r Error creating Thread [%s]\n", strerror(err));
 		return -1;
 	}
 	else 
