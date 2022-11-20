@@ -1,0 +1,57 @@
+1.1	2²³ 	     = 8M 	Bytes
+	2²³ / 2¹     = 4M 	Half-Words(8 bits)
+	2²³ / 2²     = 2M 	Words (16 bits)
+	2²³ / 2³     = 1M 	Double Words (32 bits)
+	
+1.2     memory [0x000000, 0x7FFFFF]
+	last quarter -> [0x600000, 0x7FFFFF]
+	
+	byte: 0x600000, 0x600001, 0x7FFFFE, 0x7FFFFF (qualquer endereço é valido)
+	half-word: 0x600000, 0x600002, 0x7FFFB, 0x7FFFFE (qualquer endereço com o LSB==0 aka potencia de 2 aka)
+	words: 0x600000, 0x600004, 0x7FFFF8, 0x7FFFFB (qualquer endereço com 2s LSB==0 aka potencia de 4 aka)
+	double-words: words: 0x600000, 0x600008, 0x7FFFF0, 0x7FFFF8 (qualquer endereço com 3s LSB==0 aka potencia de 8 aka)
+
+1.3	14 902 = 3A36
+	6-> 00000110
+	CAN BE: BYTE/HALF-WORD
+	
+	3 710 = E7E
+	E-> 11111110
+	CAN BE: BYTE/HALF-WORD
+	
+	5 555 = 15B3
+	3-> 00000011
+	CAN BE: BYTE
+	
+	764 = 2FC
+	c -> 11111100
+	CAN BE: BYTE/HALF-WORD/WORD
+	
+	2 760 = AC8
+	8-> 00001000
+	CAN BE: BYTE/HALF-WORD/WORD/DOUBLE-WORD
+	
+	
+1.4	11 899 675
+	11M > 8M can't be a valid address
+	2²⁴ > 2²³
+	
+2.1	128Mbit SDRAM  organizada em 8 banks cada um 4096 rows x 1024 columns of 4 bits
+
+	8 banks -> 3 linhas
+	EM SDRAM PROCURAMOS POR LINHA E DEPOIS MULTIPLEXAGEM POR BLOCO
+	4096 = 2¹² -> 12 linhas
+	1024 = 2¹⁰ -> multiplexer por 10
+	15 bits necessários
+	
+	
+	
+2.2	64 bit -> 64/4=16
+	there are needed 16 chips to create a 64-bit data wide memory system
+	
+2.3	16 chips -> 2⁴
+	cada ship com 128Mbit -> 2²⁷
+	2²⁷ * 2⁴ = 2³¹ = 2000Mbits = 2³¹/2³ Mbytes = 256 Mbytes
+
+2.4		 
+
