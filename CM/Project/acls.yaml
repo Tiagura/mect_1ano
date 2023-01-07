@@ -1,0 +1,78 @@
+acls:
+    nfv-dns:
+        - rule:
+            dl_type: 0x0800 #ipv4
+            nw_proto: 6 #tcp
+            tcp_dst: 53 #dnsmasq port default is 53
+            actions:
+                output:
+                    set_fields:
+                        - eth_dst: "00:00:00:00:00:01" #MAC of host named DNS
+                allow: True
+        # Force TCP DNS to our DNS server (host dns)
+        - rule:
+            dl_type: 0x0800 #ipv4
+            nw_proto: 17 #udp
+            udp_dst: 53 #dnsmasq port default is 53  
+            actions:
+                output:
+                    set_fields:
+                        - eth_dst: "00:00:00:00:00:01" #MAC of host named DNS
+                allow: True
+    allow-all:
+        - rule:
+            actions:
+                allow: True
+    conntrack_fw:
+        # Permit all ARP traffic such that hosts can resolve one another's MACs
+        - rule:
+            eth_type: 0x0806 #arp
+            actions:
+                allow: True
+        # Begin tracking ALL untrackked IPv4 connections
+        - rule:
+            eth_type: 0x0800  # ipv4
+            ct_state: 0/0x20 # match -trk (untracked)
+            actions:
+                # Re-inject tracked packet into the OP pipeline, containing additional connection 
+                # metadata, to default table 0. The tracked packet is again evaluated by Faucet ACLs
+                # in table 0. The original, untracked packet is effectively dropped
+                ct:
+                    zone: 10 # arbitrary conntrack zone ID to match agains later
+                    table: 0
+        # Commit new ipv4 connection from host44 to host45
+        - rule: 
+            eth_type: 0x0800 # ipv4
+            ipv4_src: 10.0.4.44
+            ipv4_dst: 10.0.5.45
+            ct_state: 0x21/0x21 # match +new - packet to establish a new connection
+            actions:
+                # Commit the connection to the connection tracking module whicj will be stored 
+                # beyond the lifetime of packet in the pipeline
+                ct:
+                    zone: 10 # the same conntrack zone ID as above
+                    flags: 1 # commit the new connection
+                    table: 1 # implicit allow the new connection packet via faucet table 1
+                    nat: #sNAT the connection to the faucet VIP
+                        flags: 1
+                        range_ipv4_min: 10.0.4.254
+                        range_ipv4_max: 10.0.4.254
+        # Allow packets in either direction from existing connections initiated by host44
+        - rule: 
+            eth_type: 0x0800 # ipv4
+            ct_zone: 10 # match packets associated with our conntrack zone ID
+            ct_state: 0x22/0x22 # match +est - packets in an established connection
+            actions:
+                ct: 
+                    zone: 10
+                    flags: 1
+                    table: 1
+                    nat:
+                        flags: 1
+        # Blocks connections initiated by host45 to host44
+        - rule:
+            eth_type: 0x0800 # ipv4
+            ipv4_src: 10.0.5.45
+            ipv4_dst: 10.0.4.44
+            actions:
+                allow: False

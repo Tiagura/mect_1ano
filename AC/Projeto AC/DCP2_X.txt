@@ -1,0 +1,152 @@
+interfaces {
+    bridge br20 {
+        member {
+            interface eth2.20 {
+            }
+            interface vxlan20 {
+            }
+        }
+    }
+    bridge br30 {
+        member {
+            interface eth2.30 {
+            }
+            interface vxlan30 {
+            }
+        }
+    }
+    bridge br50 {
+        address 10.2.0.2/22
+        description "client x"
+        member {
+            interface eth1 {
+            }
+            interface vxlan50 {
+            }
+        }
+    }
+    dummy dum0 {
+        address 10.0.0.204/32
+    }
+    ethernet eth0 {
+        address 10.0.1.18/30
+        hw-id 08:00:27:33:6f:e5
+    }
+    ethernet eth1 {
+        hw-id 08:00:27:6b:70:d6
+    }
+    ethernet eth2 {
+        hw-id 08:00:27:f9:1b:ef
+        vif 20 {
+        }
+        vif 30 {
+        }
+    }
+    ethernet eth3 {
+        hw-id 08:00:27:29:4a:31
+    }
+    ethernet eth4 {
+        hw-id 08:00:27:7a:20:7f
+    }
+    ethernet eth5 {
+        hw-id 08:00:27:ad:da:a4
+    }
+    loopback lo {
+    }
+    vxlan vxlan20 {
+        mtu 1500
+        remote 10.0.1.14
+        vni 20
+    }
+    vxlan vxlan30 {
+        mtu 1500
+        remote 10.0.1.14
+        vni 30
+    }
+    vxlan vxlan50 {
+        mtu 1500
+        source-address 10.0.0.204
+        vni 50
+    }
+}
+protocols {
+    bgp {
+        address-family {
+            l2vpn-evpn {
+                advertise-all-vni
+            }
+        }
+        neighbor 10.0.0.203 {
+            peer-group evpn
+        }
+        parameters {
+            router-id 10.0.0.204
+        }
+        peer-group evpn {
+            address-family {
+                l2vpn-evpn {
+                    nexthop-self {
+                    }
+                }
+            }
+            remote-as 43100
+            update-source dum0
+        }
+        system-as 43100
+    }
+    ospf {
+        area 0 {
+            network 10.0.1.16/30
+            network 10.0.0.204/32
+        }
+    }
+}
+system {
+    config-management {
+        commit-revisions 100
+    }
+    conntrack {
+        modules {
+            ftp
+            h323
+            nfs
+            pptp
+            sip
+            sqlnet
+            tftp
+        }
+    }
+    console {
+        device ttyS0 {
+            speed 115200
+        }
+    }
+    host-name vyos
+    login {
+        user vyos {
+            authentication {
+                encrypted-password ****************
+                plaintext-password ****************
+            }
+        }
+    }
+    ntp {
+        server time1.vyos.net {
+        }
+        server time2.vyos.net {
+        }
+        server time3.vyos.net {
+        }
+    }
+    syslog {
+        global {
+            facility all {
+                level info
+            }
+            facility protocols {
+                level debug
+            }
+        }
+    }
+}
+

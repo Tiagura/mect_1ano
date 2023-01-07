@@ -6,11 +6,11 @@
 ** Use VBoxManage or the VirtualBox Manager GUI to make changes.
 -->
 <VirtualBox xmlns="http://www.virtualbox.org/" version="1.16-linux">
-  <Machine uuid="{0262aee2-4206-4a29-851e-0e6d972fcc16}" name="VYOS-2" OSType="Linux_64" currentSnapshot="{f322b7e5-1f32-41b7-9090-8b908af3dc15}" snapshotFolder="Snapshots" lastStateChange="2022-11-17T15:56:31Z">
+  <Machine uuid="{c479a974-9aba-49a3-b6fb-78b3252b6caf}" name="VYOS-2" OSType="Linux_64" currentSnapshot="{f322b7e5-1f32-41b7-9090-8b908af3dc15}" snapshotFolder="Snapshots" lastStateChange="2022-11-24T13:28:18Z">
     <ExtraData>
       <ExtraDataItem name="GNS3/Clone" value="yes"/>
       <ExtraDataItem name="GUI/LastCloseAction" value="PowerOff"/>
-      <ExtraDataItem name="GUI/LastNormalWindowPosition" value="154,636,720,444"/>
+      <ExtraDataItem name="GUI/LastNormalWindowPosition" value="154,556,720,444"/>
     </ExtraData>
     <Snapshot uuid="{f322b7e5-1f32-41b7-9090-8b908af3dc15}" name="reset" timeStamp="2022-11-17T14:56:10Z">
       <Hardware>
@@ -86,8 +86,8 @@
             <InternalNetwork name="intnet"/>
             <GenericInterface driver="UDPTunnel">
               <Property name="dest" value="127.0.0.1"/>
-              <Property name="dport" value="10027"/>
-              <Property name="sport" value="10026"/>
+              <Property name="dport" value="10031"/>
+              <Property name="sport" value="10030"/>
             </GenericInterface>
             <NATNetwork name="NatNetwork"/>
           </DisabledModes>
@@ -97,8 +97,8 @@
             <InternalNetwork name="intnet"/>
             <GenericInterface driver="UDPTunnel">
               <Property name="dest" value="127.0.0.1"/>
-              <Property name="dport" value="10033"/>
-              <Property name="sport" value="10032"/>
+              <Property name="dport" value="10035"/>
+              <Property name="sport" value="10034"/>
             </GenericInterface>
             <NATNetwork name="NatNetwork"/>
           </DisabledModes>
@@ -121,11 +121,22 @@
           </DisabledModes>
           <GenericInterface driver="UDPTunnel">
             <Property name="dest" value="127.0.0.1"/>
-            <Property name="dport" value="10045"/>
-            <Property name="sport" value="10044"/>
+            <Property name="dport" value="10043"/>
+            <Property name="sport" value="10042"/>
           </GenericInterface>
         </Adapter>
         <Adapter slot="4" enabled="true" MACAddress="080027658A3A" cable="false" type="82540EM">
+          <DisabledModes>
+            <InternalNetwork name="intnet"/>
+            <NATNetwork name="NatNetwork"/>
+          </DisabledModes>
+          <GenericInterface driver="UDPTunnel">
+            <Property name="dest" value="127.0.0.1"/>
+            <Property name="dport" value="10047"/>
+            <Property name="sport" value="10046"/>
+          </GenericInterface>
+        </Adapter>
+        <Adapter slot="5" enabled="true" MACAddress="0800270CA831" cable="false" type="82540EM">
           <DisabledModes>
             <InternalNetwork name="intnet"/>
             <NATNetwork name="NatNetwork"/>
@@ -136,17 +147,6 @@
             <Property name="sport" value="10050"/>
           </GenericInterface>
         </Adapter>
-        <Adapter slot="5" enabled="true" MACAddress="0800270CA831" cable="false" type="82540EM">
-          <DisabledModes>
-            <InternalNetwork name="intnet"/>
-            <NATNetwork name="NatNetwork"/>
-          </DisabledModes>
-          <GenericInterface driver="UDPTunnel">
-            <Property name="dest" value="127.0.0.1"/>
-            <Property name="dport" value="10057"/>
-            <Property name="sport" value="10056"/>
-          </GenericInterface>
-        </Adapter>
       </Network>
       <UART>
         <Port slot="0" enabled="false" IOBase="0x3f8" IRQ="4" server="true" path="/tmp/gns3_vbox/c479a974-9aba-49a3-b6fb-78b3252b6caf" hostMode="HostPipe"/>
@@ -155,9 +155,9 @@
       <RTC localOrUTC="UTC"/>
       <Clipboard/>
       <GuestProperties>
-        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="en_US" timestamp="1668700591906064000" flags=""/>
-        <GuestProperty name="NameInGNS3" value="VYOS-2" timestamp="1668697177034874000" flags=""/>
-        <GuestProperty name="ProjectDirInGNS3" value="/home/tiago/Desktop/Uni/mect_1ano/AC/Pratica5/VXLAN/project-files/virtualbox/c479a974-9aba-49a3-b6fb-78b3252b6caf" timestamp="1668697177166907000" flags=""/>
+        <GuestProperty name="/VirtualBox/HostInfo/GUI/LanguageID" value="en_US" timestamp="1669296498137336000" flags=""/>
+        <GuestProperty name="NameInGNS3" value="VYOS-2" timestamp="1669295908301450000" flags=""/>
+        <GuestProperty name="ProjectDirInGNS3" value="/home/tiago/Desktop/Uni/mect_1ano/AC/Pratica5/VXLAN/project-files/virtualbox/c479a974-9aba-49a3-b6fb-78b3252b6caf" timestamp="1669295908412180000" flags=""/>
       </GuestProperties>
     </Hardware>
     <StorageControllers>

@@ -1,0 +1,134 @@
+include:
+ - acls.yaml
+
+vlans:
+   vlan100:
+      vid: 100
+      faucet_vips: ["10.0.1.254/24"]
+      faucet_mac: "00:00:00:00:00:11"
+      acls_in: [nfv-dns, allow-all]
+   vlan200:
+      vid: 200
+      faucet_vips: ["10.0.2.254/24"]
+      faucet_mac: "00:00:00:00:00:22"
+      acls_in: [nfv-dns, allow-all]
+   vlan400:
+      vid: 400
+      faucet_vips: ["10.0.4.254/24"]
+      faucet_mac: "00:00:00:00:00:44"
+   vlan500:
+      vid: 500
+      faucet_vips: ["10.0.5.254/24"]
+      faucet_mac: "00:00:00:00:00:55"
+routers:
+   router-1:
+      vlans: [vlan100, vlan200, vlan400, vlan500]
+dps:
+   s1:
+      dp_id: 0x1
+      hardware: "Open vSwitch"
+      stack:
+         priority: 1
+      interfaces:
+          1:
+            name: "host1"
+            description: "host1 network namespace"
+            native_vlan: vlan100
+          2:
+            name: "host2"
+            description: "host2 network namespace"
+            native_vlan: vlan200
+          3:
+            name: "switch2"
+            description: "s1 to s2"
+            stack:
+               dp: s2
+               port: 3
+          4:
+            name: "switch3"
+            description: "s1 to s3"
+            stack: 
+               dp: s3
+               port: 3
+          5:
+            name: "switch4"
+            description: "s1 to s4"
+            stack:
+               dp: s4
+               port: 4
+          6:
+            name: "dnsmasq"
+            description: "dnsmasq server"
+            tagged_vlans: [vlan100, vlan200] 
+   s2: 
+      dp_id: 0x2
+      hardware: "Open vSwitch"
+      interfaces:
+          1:
+            name: "host1"
+            description: "host1 network namespace"
+            native_vlan: vlan100
+          2:
+            name: "host2"
+            description: "host2 network namespace"
+            native_vlan: vlan200
+          3:
+            name: "switch1"
+            description: "s2 to s1"
+            stack: 
+               dp: s1
+               port: 3
+          4:
+            name: "switch3"
+            description: "s2 to s3"
+            stack:
+               dp: s3
+               port: 4
+   s3: 
+      dp_id: 0x3
+      hardware: "Open vSwitch"
+      interfaces:
+          1:
+            name: "host1"
+            description: "host1 network namespace"
+            native_vlan: vlan100
+          2:
+            name: "host2"
+            description: "host2 network namespace"
+            native_vlan: vlan200
+          3:
+            name: "switch1"
+            description: "s3 to s1"
+            stack:
+               dp: s1
+               port: 4
+          4:
+            name: "switch2"
+            description: "s3 to s2"
+            stack:
+               dp: s2
+               port: 4
+   s4: 
+      dp_id: 0x4
+      hardware: "Open vSwitch"
+      interfaces:
+          1:
+            name: "host1"
+            description: "host1 network namespace"
+            native_vlan: vlan100
+          2:
+            name: "host4"
+            description: "host4 network namespace"
+            native_vlan: vlan400
+            acls_in: [conntrack_fw, allow-all ]
+          3:
+            name: "host5"
+            description: "host5 network namespace"
+            native_vlan: vlan500
+            acls_in: [conntrack_fw, allow-all ]
+          4:
+            name: "switch1"
+            description: "s4 to s1"
+            stack:
+               dp: s1
+               port: 5

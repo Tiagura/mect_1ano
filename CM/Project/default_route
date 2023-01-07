@@ -1,0 +1,2 @@
+h44 ip route add default via 10.0.4.254
+h45 ip route add default via 10.0.5.254

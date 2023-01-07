@@ -1,0 +1,8 @@
+[
+    {
+        "hdd": "{7e38b47c-4951-46be-ac4b-b5db3b15cc99}.vdi",
+        "controller": "SATA",
+        "port": "0",
+        "device": "0"
+    }
+]

@@ -1,0 +1,7 @@
+h11 ifconfig h11-eth1 0.0.0.0 0.0.0.0 && dhclient -v
+h12 ifconfig h12-eth1 0.0.0.0 0.0.0.0 && dhclient -v
+h21 ifconfig h21-eth1 0.0.0.0 0.0.0.0 && dhclient -v
+h22 ifconfig h22-eth1 0.0.0.0 0.0.0.0 && dhclient -v
+h31 ifconfig h31-eth1 0.0.0.0 0.0.0.0 && dhclient -v
+h32 ifconfig h32-eth1 0.0.0.0 0.0.0.0 && dhclient -v
+h41 ifconfig h41-eth1 0.0.0.0 0.0.0.0 && dhclient -v

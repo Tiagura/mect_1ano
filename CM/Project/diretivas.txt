@@ -1,0 +1,16 @@
+mininet with python 3 (http://mininet.org/download/#important-note-python-2-and-python-3-mininet)
+sudo apt-get install conntrack (usar acl conntrack_fw)
+sudo apt-get install dnsmasq (make use of dhcp/dns server)
+faucet container (https://docs.openvswitch.org/en/latest/tutorials/faucet/#switching)
+faucet in port 6653, mininet listenning in port 6653
+(stack switching https://docs.faucet.nz/en/latest/tutorials/stacking.html)
+
+Comandos:
+docker start faucet
+sudo python3 faucet_mininet.py
+
+MININET CLI:
+xterm dns -> ./conf_dns.sh (nao esquecer chmod)
+source get_ip_dns
+source default_route
+
