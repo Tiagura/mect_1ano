@@ -15,7 +15,8 @@ using namespace std;
 class codec_video{
     private:
         int mode;
-        uint32_t x, y;
+        uint32_t period;
+        int quantization;
 
         //  Function to write the encoded data to a file
         int write_bin_to_file(const char* fileOut, string encoded){
@@ -68,78 +69,228 @@ class codec_video{
             return encoded;
         }
 
-        // Function to read file to frames
-        string read_file_to_frames(const char* fileIn, uint32_t n_frames, uint32_t height, uint32_t width, uint32_t frame_type, Mat[] to_store ){
-            //open file
-            ifstream filer(fileIn, ios::in | ios::binary);
-            //ignore first line
-            string header = getline(filer, line);
-            cout << "HEADER: " << header << endl;
-            string line;                            //line to read
-            uint32_t size = height*width*1.5;       //read height*width*1,5 bytes
-            char* buffer = new char[size];
+        // Function to read YUV420 file to frames
+        string YUV420_read(const char* fileIn, uint32_t n_frames, uint32_t height, uint32_t width, Mat* to_store ){
+            //open file with fopen
+            FILE* input = fopen(fileIn, "r");
+
+            //read first line
+            char header[100];
+            fgets(header, 100, input);
+            //remove trailing newline
+            header[strlen(header)-1] = '\0';                           
+
+            //read next line
+            char line[100];                          //line to "FRAMES\n"
             for(uint32_t i = 0; i < n_frames; i++){
-                //read next line and check if contains "FRAME"
-                getline(filer, line);
-                if(line.find("FRAME") == std::string::npos){       //check if frame start
-                    cout << "Error reading file" << endl;
-                    return "";
-                }
-                //read frame
-                filer.read(buffer, size);
-                //write frame to Mat
-                Mat tmp(height, width, frame_type);
-                //write y plane
+                //create frame to store
+                Mat tmp = Mat::zeros(height, width, CV_8UC3);
+
+                fgets(line, 100, input);                        //read line
+                
+                //read Y values
                 for(uint32_t j = 0; j < height; j++){
                     for(uint32_t k = 0; k < width; k++){
-                        tmp.at<Vec3b>(j,k)[0] = buffer[j*width+k];
+                        char c = fgetc(input);
+                        tmp.at<Vec3b>(j,k)[0] = (unsigned int) c;
                     }
                 }
-                //write Cb plane for 4 pixels at a time (2x2)
+
+
+                //read U values, 4 pixels per byte
                 for(uint32_t j = 0; j < height; j+=2){
                     for(uint32_t k = 0; k < width; k+=2){
-                        tmp.at<Vec3b>(j,k)[1] = buffer[height*width + (j/2)*(width/2) + (k/2)];
-                        tmp.at<Vec3b>(j+1,k)[1] = buffer[height*width + (j/2)*(width/2) + (k/2)];
-                        tmp.at<Vec3b>(j,k+1)[1] = buffer[height*width + (j/2)*(width/2) + (k/2)];
-                        tmp.at<Vec3b>(j+1,k+1)[1] = buffer[height*width + (j/2)*(width/2) + (k/2)];
+                        char c = fgetc(input);
+                        tmp.at<Vec3b>(j,k)[1] = (unsigned int) c;
+                        tmp.at<Vec3b>(j,k+1)[1] = (unsigned int) c;
+                        tmp.at<Vec3b>(j+1,k)[1] = (unsigned int) c;
+                        tmp.at<Vec3b>(j+1,k+1)[1] = (unsigned int) c;
                     }
                 }
-                //write Cr plane for 4 pixels at a time (2x2)
+
+                //read V values, 4 pixels per byte
                 for(uint32_t j = 0; j < height; j+=2){
                     for(uint32_t k = 0; k < width; k+=2){
-                        tmp.at<Vec3b>(j,k)[2] = buffer[height*width + (width/2)*(height/2) + (j/2)*(width/2) + (k/2)];
-                        tmp.at<Vec3b>(j+1,k)[2] = buffer[height*width + (width/2)*(height/2) + (j/2)*(width/2) + (k/2)];
-                        tmp.at<Vec3b>(j,k+1)[2] = buffer[height*width + (width/2)*(height/2) + (j/2)*(width/2) + (k/2)];
-                        tmp.at<Vec3b>(j+1,k+1)[2] = buffer[height*width + (width/2)*(height/2) + (j/2)*(width/2) + (k/2)];
+                        char c = fgetc(input);
+                        tmp.at<Vec3b>(j,k)[2] = (unsigned int) c;
+                        tmp.at<Vec3b>(j,k+1)[2] = (unsigned int) c;
+                        tmp.at<Vec3b>(j+1,k)[2] = (unsigned int) c;
+                        tmp.at<Vec3b>(j+1,k+1)[2] = (unsigned int) c;
                     }
                 }
-                //add frame to array
-                to_store[i] = new Mat(tmp);
+
+                //store frame
+                to_store[i] = tmp.clone();
+                //free(tmp);
+                tmp.release();
             }
-            filer.close();
+
+            fclose(input);
             return header;
         }
 
+        // Function to write YUV420 file to frames
+        int YUV420_write(const char* fileOut, uint32_t n_frames, uint32_t height, uint32_t width, Mat* to_write, string header){
+            //open file with fopen
+            FILE* output = fopen(fileOut, "w");
+
+            //write header
+            fprintf(output, "%s", header.c_str());
+
+            fprintf(output, "\n");
+            //write frames
+            for(uint32_t i = 0; i < n_frames; i++){
+                //write FRAME\n
+                fprintf(output, "FRAME\n");
+
+                //write Y values
+                for(uint32_t j = 0; j < height; j++){
+                    for(uint32_t k = 0; k < width; k++){
+                        fputc(to_write[i].at<Vec3b>(j,k)[0], output);
+                    }
+                }
+
+                //write U values, 4 pixels per byte
+                for(uint32_t j = 0; j < height; j+=2){
+                    for(uint32_t k = 0; k < width; k+=2){
+                        fputc(to_write[i].at<Vec3b>(j,k)[1], output);
+                    }
+                }
+
+                //write V values, 4 pixels per byte
+                for(uint32_t j = 0; j < height; j+=2){
+                    for(uint32_t k = 0; k < width; k+=2){
+                        fputc(to_write[i].at<Vec3b>(j,k)[2], output);
+                    }
+                }
+            }
+
+            fclose(output);
+            return 0;
+        }
+
+        // Function to read YUV422 file to frames
+        string YUV422_read(const char* fileIn, uint32_t n_frames, uint32_t height, uint32_t width, Mat* to_store ){
+            //open file with fopen
+            FILE* input = fopen(fileIn, "r");
+
+            //read first line
+            char header[100];
+            fgets(header, 100, input);
+            //remove trailing newline
+            header[strlen(header)-1] = '\0';                           
+
+            //read next line
+            char line[100];                          //line to "FRAMES\n"
+            for(uint32_t i = 0; i < n_frames; i++){
+                //create frame to store
+                Mat tmp = Mat::zeros(height, width, CV_8UC3);
+
+                fgets(line, 100, input);                        //read line
+                
+                //read Y values
+                for(uint32_t j = 0; j < height; j++){
+                    for(uint32_t k = 0; k < width; k++){
+                        char c = fgetc(input);
+                        tmp.at<Vec3b>(j,k)[0] = (unsigned int) c;
+                    }
+                }
+
+                //read U values 
+                for(uint32_t j = 0; j < height; j++){
+                    for(uint32_t k = 0; k < width; k+=2){
+                        char c = fgetc(input);
+                        tmp.at<Vec3b>(j,k)[1] = (unsigned int) c;
+                        tmp.at<Vec3b>(j,k+1)[1] = (unsigned int) c;
+                    }
+                }
+
+                //read V values
+                for(uint32_t j = 0; j < height; j++){
+                    for(uint32_t k = 0; k < width; k+=2){
+                        char c = fgetc(input);
+                        tmp.at<Vec3b>(j,k)[2] = (unsigned int) c;
+                        tmp.at<Vec3b>(j,k+1)[2] = (unsigned int) c;
+                    }
+                }
+
+                //store frame
+                to_store[i] = tmp.clone();
+                //free(tmp);
+                tmp.release();
+
+                //break;
+            }
+
+            fclose(input);
+            return header;
+        }
+
+        // Function to write YUV422 file to frames
+        int YUV422_write(const char* fileOut, uint32_t n_frames, uint32_t height, uint32_t width, Mat* to_write, string header){
+            //open file with fopen
+            FILE* output = fopen(fileOut, "w");
+
+            //write header
+            fprintf(output, "%s", header.c_str());
+
+            fprintf(output, "\n");
+            //write frames
+            for(uint32_t i = 0; i < n_frames; i++){
+                //write FRAME\n
+                fprintf(output, "FRAME\n");
+
+                //write Y values
+                for(uint32_t j = 0; j < height; j++){
+                    for(uint32_t k = 0; k < width; k++){
+                        fputc(to_write[i].at<Vec3b>(j,k)[0], output);
+                    }
+                }
+
+                //write U values, 2 pixels per byte
+                for(uint32_t j = 0; j < height; j++){
+                    for(uint32_t k = 0; k < width; k+=2){
+                        fputc(to_write[i].at<Vec3b>(j,k)[1], output);
+                    }
+                }
+
+                //write V values, 2 pixels per byte
+                for(uint32_t j = 0; j < height; j++){
+                    for(uint32_t k = 0; k < width; k+=2){
+                        fputc(to_write[i].at<Vec3b>(j,k)[2], output);
+                    }
+                }
+            }
+
+            fclose(output);
+            return 0;
+        }
+
     public:
-        codec_video(int mode, uint32_t x, uint32_t y){
+        codec_video(int mode, uint32_t p,uint8_t quantization){
             this->mode = mode;
-            this->x = x;
-            this->y = y;
+            this->period = p;
+            this->quantization = quantization;
         }
 
         codec_video(){
             this->mode = 8;
-            this->x = 2500;
-            this->y = 2500;
+            this->period = 100;
+            this->quantization = 0;
+        }
+
+        codec_video(int mode, uint32_t p){
+            this->mode = mode;
+            this->period = p;
+            this->quantization = 0;
         }
 
         //  Function to encode a video file
-        int encode_video(const char* fileIn, const char* fileOut){
+        int encode_video(const char* fileIn, const char* fileOut, string yuv_format){
             
             clock_t time_req;                           //for time measurement
             time_req = clock();                         //start time measurement
             
-            Mat frame;                  //frame to store video frame
             VideoCapture cap(fileIn);   //read video
 
             //check if video is opened
@@ -148,23 +299,15 @@ class codec_video{
                 return -1;
             }
 
-            VideoCapture cap2(fileIn);
-            cap2 >> frame;
-
-
             //get video info
             uint32_t width = cap.get(CAP_PROP_FRAME_WIDTH);
             uint32_t height = cap.get(CAP_PROP_FRAME_HEIGHT);
-            uint32_t fps = cap.get(CAP_PROP_FPS);
             uint32_t frames = cap.get(CAP_PROP_FRAME_COUNT);
-            uint32_t frame_type = frame.type();
-            int fourcc = cap.get(CAP_PROP_FOURCC);
-            
-            //close cap2   
-            cap2.release();
+            //close    
+            cap.release();
 
             //create image codec
-            image_codec encoder(mode, x, y);
+            image_codec encoder(this->mode, this->period,this->quantization);
         
             string encoded=""; //string to store encoded data
 
@@ -172,46 +315,72 @@ class codec_video{
             cout << "Video info: " << endl;
             cout << "\tWidth: " << width << endl;
             cout << "\tHeight: " << height << endl;
-            cout << "\tFPS: " << fps << endl;
             cout << "\tFrames: " << frames << endl;
-            cout << "\tFrame type: " << frame_type << endl;
-            cout << "\tFourCC: " << fourcc << endl;
+            cout << "\tPeriod: " << this->period << endl;
             cout << "\tMode: " << this->mode << endl;
-            cout << "\tX: " << this->x << endl;
-            cout << "\tY: " << this->y << endl;
+            cout << "\tQuantization: " << this->quantization << endl;
+            cout << "\tYUV format: " << yuv_format << endl;
 
             //alloc space for frames
             Mat* to_store = new Mat[frames];
-            //read video
-            string header = read_file_to_frames(fileIn, frames, height, width, frame_type, to_store);
 
-            //create header to store video info
-            //width 32 bits, height 32 bits, fps 32 bits, frames 32 bits, frame type 32 bits, fourcc 32 bits, mode 4 bits, x 32 bits, y 32 bits
+            //create header of encoded file to store video info
+            //width 32 bits, height 32 bits, frames 32 bits, period 32 bits, mode 4 bits, quantization 8 bits, yuv_format 3 bytes(420,422), header size 16 bits, header n bytes
             encoded += bitset<32>(width).to_string();
             encoded += bitset<32>(height).to_string();
-            encoded += bitset<32>(fps).to_string();
             encoded += bitset<32>(frames).to_string();
-            encoded += bitset<32>(frame_type).to_string();
-            encoded += bitset<32>(fourcc).to_string();
+            encoded += bitset<32>(this->period).to_string();
             encoded += bitset<4>(this->mode).to_string();
-            encoded += bitset<32>(this->x).to_string();
-            encoded += bitset<32>(this->y).to_string();
-
-            namedWindow("rgb", WINDOW_AUTOSIZE);
-
-            //encode each frame
-            for(uint32_t i = 0; i < frames; i++){
-
-                imshow("rgb", to_store[i]);
-                waitKey(1);
-
-                //encode frame
-                encoded += encoder.encode_video_frame(to_store[i]);
-
-                cout << "Frame " << i << " encoded" << endl;
-                if(i==0) { imwrite("encoded_frame" + to_string(i) + ".ppm", to_store[i]); }
+            encoded += bitset<8>(this->quantization).to_string();
+            
+            string header = "";     //string to store header
+            if(yuv_format=="YUV420"){
+                header = YUV420_read(fileIn, frames, height, width, to_store);  //read YUV420 file
+                encoded += bitset<8>('4').to_string();
+                encoded += bitset<8>('2').to_string();
+                encoded += bitset<8>('0').to_string();
+            }else if(yuv_format=="YUV422"){
+                header = YUV422_read(fileIn, frames, height, width, to_store);  //read YUV422 file
+                encoded += bitset<8>('4').to_string();
+                encoded += bitset<8>('2').to_string();
+                encoded += bitset<8>('2').to_string();
+            }else{
+                cout << "Error: YUV format not supported" << endl;
+                return -1;
             }
 
+            encoded += bitset<16>(header.size()).to_string();
+            for(uint32_t i = 0; i < header.size(); i++){
+                encoded += bitset<8>(header[i]).to_string();
+            }
+
+            cout << "\tHeader size: " << header.size() << endl;
+            cout << "\tHeader: " << header << endl;   
+
+            if(yuv_format=="YUV420"){
+                cout << "\nEncoding YUV420 video..." << endl;
+                //encode each frame
+                for(uint32_t i = 0; i < frames; i++){
+                    //encode frame
+                    encoded += encoder.YUV420_encode_video_frame(to_store[i]);
+
+
+                    //if(i==150) { cvtColor(to_store[i], to_store[i], COLOR_YUV2BGR); imwrite("422_encoded_frame" + to_string(i) + ".ppm", to_store[i]); }
+                    //break;
+                }
+            }else if(yuv_format=="YUV422"){
+                cout << "\nEncoding YUV422 video..." << endl;
+                for(uint32_t i = 0; i < frames; i++){
+                    //encode frame
+                    encoded += encoder.YUV422_encode_video_frane(to_store[i]);
+
+                    //if(i==0) { cvtColor(to_store[i], to_store[i], COLOR_YUV2BGR); imwrite("422_encoded_frame" + to_string(i) + ".ppm", to_store[i]); }
+                    //break;
+                }
+            }else{
+                cout << "Error: YUV format not supported" << endl;
+                return -1;
+            }
 
             //write encoded data to file
             write_bin_to_file(fileOut, encoded);
@@ -241,55 +410,86 @@ class codec_video{
             string encoded = read_bin_from_file(fileIn);
 
             //get video info from header
-            //width 32 bits, height 32 bits, fps 32 bits, frames 32 bits, frame type 32 bits, fourcc 32 bits, mode 4 bits, x 32 bits, y 32 bits
-            uint32_t width = bitset<32>(encoded.substr(0, 32)).to_ulong();
-            uint32_t height = bitset<32>(encoded.substr(32, 32)).to_ulong();
-            uint32_t fps = bitset<32>(encoded.substr(64, 32)).to_ulong();
-            uint32_t frames = bitset<32>(encoded.substr(96, 32)).to_ulong();
-            uint32_t frame_type = bitset<32>(encoded.substr(128, 32)).to_ulong();
-            int fourcc = bitset<32>(encoded.substr(160, 32)).to_ulong();
-            this->mode = bitset<4>(encoded.substr(192, 4)).to_ulong();
-            this->x = bitset<32>(encoded.substr(196, 32)).to_ulong();
-            this-> y = bitset<32>(encoded.substr(228, 32)).to_ulong();
+            //width 32 bits, height 32 bits, frames 32 bits, period 32 bits, mode 4 bits, quantization 8 bits, yuv_format 3 bytes(420,422), header size 16 bits, header n bytes
+            uint32_t width = bitset<32>(encoded.substr(0,32)).to_ulong();
+            uint32_t height = bitset<32>(encoded.substr(32,32)).to_ulong();
+            uint32_t frames = bitset<32>(encoded.substr(64,32)).to_ulong();
+            this->period = bitset<32>(encoded.substr(96,32)).to_ulong();
+            this->mode = bitset<4>(encoded.substr(128,4)).to_ulong();
+            this->quantization = bitset<8>(encoded.substr(132,8)).to_ulong();
             
+            string yuv_format = "YUV";
+            string yuv_bin = encoded.substr(140,24);
+            for(uint8_t i = 0; i < 3; i++){
+                yuv_format += (char)bitset<8>(yuv_bin.substr(i*8,8)).to_ulong();
+            }
+            
+            uint16_t header_size = bitset<16>(encoded.substr(164,16)).to_ulong();
+
+            string header_bin = encoded.substr(180,header_size*8);
+            string header = "";
+            for(uint16_t i = 0; i < header_size; i++){
+                header += (char)bitset<8>(header_bin.substr(i*8,8)).to_ulong();
+            }
+
+            encoded = encoded.substr(180+header_size*8);    //remove header from encoded string
+
+
             //print video info
             cout << "Video info: " << endl;
             cout << "\tWidth: " << width << endl;
             cout << "\tHeight: " << height << endl;
-            cout << "\tFPS: " << fps << endl;
             cout << "\tFrames: " << frames << endl;
-            cout << "\tFrame type: " << frame_type << endl;
-            cout << "\tFourCC: " << fourcc << endl;
-            cout << "\tMode: " << mode << endl;
-            cout << "\tX: " << x << endl;
-            cout << "\tY: " << y << endl;
+            cout << "\tP: " << this->period << endl;
+            cout << "\tMode: " << this->mode << endl;
+            cout << "\tQuantization: " << this->quantization << endl;
+            cout << "\tYUV format: " << yuv_format << endl;
+            cout << "\tHeader size: " << header_size << endl;
+            cout << "\tHeader: " << header << endl;
 
-
-            encoded = encoded.substr(260);          //remove header from encoded string
             char* encoded_ptr = &encoded[0];    //pointer encoded string  
 
             //create image codec
-            image_codec codec(mode, x, y);      
+            image_codec codec_img(this->mode, this->period, this->quantization);      
 
-            //width is cols, height is rows
-            VideoWriter video(fileOut, fourcc, fps, Size(height, width)); //create video writer
+            Mat* to_write = new Mat[frames];         //array of frames to write to video
+            Mat* decoded_frame = new Mat(height, width, CV_8UC3); //pointer to decoded frame
 
-            Mat* decoded_frame = new Mat(height, width, frame_type);   //pointer to decoded frame
+            if(yuv_format=="YUV420"){
+                //decode video
+                for (uint32_t i = 0; i < frames; i++){
+                    encoded_ptr = codec_img.YUV420_decode_video_frame(encoded_ptr, decoded_frame, height, width);
+                    to_write[i] = *decoded_frame;
 
-            //decode video
-            for (uint32_t i = 0; i < frames; i++){
-                encoded_ptr = codec.decode_video_frame(encoded_ptr, decoded_frame, height, width, frame_type);
+                    //cout << "Frame " << i << " decoded" << endl;
 
-                //convert YUV to RGB
-                //cvtColor(frame, frame, COLOR_YUV2BGR_I420);
-                
-                //write decoded frame to video
-                video.write(*decoded_frame);
+                    //if(i==150) { cvtColor(*decoded_frame, *decoded_frame, COLOR_YUV2BGR); imwrite("420_decoded_frame" + to_string(i) + ".ppm", *decoded_frame); }
+                    //break;
+                }
+                //write decoded video to file
+                if(YUV420_write(fileOut, frames, height, width, to_write, header)!=0){
+                    cout << "Error writing video" << endl;
+                    return -1;
+                }
+            }else if(yuv_format=="YUV422"){
+                //decode video
+                for (uint32_t i = 0; i < frames; i++){
+                    encoded_ptr = codec_img.YUV422_decode_video_frame(encoded_ptr, decoded_frame, height, width);
+                    to_write[i] = *decoded_frame;
 
-                //write decoded frame as image 
-                if(i==150) { imwrite("frame" + to_string(i) + ".ppm", *decoded_frame); }
+                    //cout << "Frame " << i << " decoded" << endl;
 
-                //break;
+                    //if(i==0) { cvtColor(*decoded_frame, *decoded_frame, COLOR_YUV2BGR); imwrite("422_decoded_frame" + to_string(i) + ".ppm", *decoded_frame); }
+                    //break;
+                }
+                //write decoded video to file
+                if(YUV422_write(fileOut, frames, height, width, to_write, header)!=0){
+                    cout << "Error writing video" << endl;
+                    return -1;
+                }
+            }else{
+                cout << "Error: YUV format not supported" << endl;
+                return -1;
             }
 
             time_req = clock() - time_req;
