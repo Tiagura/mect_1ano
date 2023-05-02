@@ -1,0 +1,69 @@
+1. Static Routes
+FW1
+
+set protocols static route 0.0.0.0/0 next-hop 10.0.5.5
+set protocols static route 0.0.0.0/0 next-hop 10.0.30.6
+
+set protocols static route 10.2.2.0/24 next-hop 10.0.1.1
+set protocols static route 10.2.2.0/24 next-hop 10.0.20.2
+
+FW2
+
+set protocols static route 0.0.0.0/0 next-hop 10.0.4.6
+set protocols static route 0.0.0.0/0 next-hop 10.0.11.5
+
+set protocols static route 10.2.2.0/24 next-hop 10.0.3.2
+set protocols static route 10.2.2.0/24 next-hop 10.0.2.1
+
+2. Build Firewalls
+
+FW1
+
+set zone-policy zone INSIDE description "Inside (Internal Network)"
+set zone-policy zone INSIDE interface eth1
+set zone-policy zone INSIDE interface eth2
+set zone-policy zone OUTSIDE description "Outside (Internet)"
+set zone-policy zone OUTSIDE interface eth3
+set zone-policy zone OUTSIDE interface eth4
+
+FW2
+
+set zone-policy zone INSIDE description "Inside (Internal Network)"
+set zone-policy zone INSIDE interface eth1
+set zone-policy zone INSIDE interface eth2
+set zone-policy zone OUTSIDE description "Outside (Internet)"
+set zone-policy zone OUTSIDE interface eth3
+set zone-policy zone OUTSIDE interface eth4
+
+3. NAT/PAT
+
+FW1
+
+set nat source rule 10 outbound-interface eth3
+set nat source rule 10 source address 10.0.0.0/8
+set nat source rule 10 translation address 192.1.0.1-192.1.0.62
+set nat source rule 20 outbound-interface eth4
+set nat source rule 20 source address 10.0.0.0/8
+set nat source rule 20 translation address 192.1.0.65-192.1.0.126
+
+FW2
+
+set nat source rule 10 outbound-interface eth3
+set nat source rule 10 source address 10.0.0.0/8
+set nat source rule 10 translation address 192.1.0.129-192.1.0.190
+set nat source rule 20 outbound-interface eth4
+set nat source rule 20 source address 10.0.0.0/8
+set nat source rule 20 translation address 192.1.0.129-192.1.0.254
+
+4. Add rules to firewalls
+
+set firewall name FROM-INSIDE-TO-OUTSIDE rule 10 action accept
+set firewall name FROM-INSIDE-TO-OUTSIDE rule 10 protocol udp
+set firewall name FROM-INSIDE-TO-OUTSIDE rule 10 destination port 5000-6000
+set zone-policy zone OUTSIDE from INSIDE firewall name FROM-INSIDE-TO-OUTSIDE
+
+set firewall name FROM-OUTSIDE-TO-INSIDE rule 10 action accept
+set firewall name FROM-OUTSIDE-TO-INSIDE rule 10 state established enable
+set firewall name FROM-OUTSIDE-TO-INSIDE rule 10 state related enable
+set zone-policy zone INSIDE from OUTSIDE firewall name FROM-OUTSIDE-TO-INSIDE
+

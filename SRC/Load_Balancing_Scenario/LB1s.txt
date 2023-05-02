@@ -1,0 +1,37 @@
+LB1S conntrack-sync
+
+set high-availability vrrp group LB1Cluster vrid 10
+set high-availability vrrp group LB1Cluster interface eth0
+set high-availability vrrp group LB1Cluster virtual-address 192.168.100.1/24
+set high-availability vrrp sync-group LB1Cluster member LB1Cluster
+set high-availability vrrp group LB1Cluster rfc3768-compatibility
+
+set service conntrack-sync accept-protocol 'tcp,udp,icmp'
+set service conntrack-sync failover-mechanism vrrp sync-group LB1Cluster
+set service conntrack-sync interface eth0
+set service conntrack-sync mcast-group 225.0.0.50
+set service conntrack-sync disable-external-cache
+
+LB1A
+
+set protocols static route 10.2.2.0/24 next-hop 10.1.1.10
+
+set load-balancing wan interface-health eth1 nexthop 10.0.1.3
+set load-balancing wan interface-health eth2 nexthop 10.0.2.4
+set load-balancing wan rule 1 inbound-interface eth4
+set load-balancing wan rule 1 interface eth1 weight 1
+set load-balancing wan rule 1 interface eth2 weight 1
+set load-balancing wan sticky-connections inbound
+set load-balancing wan disable-source-nat
+
+LB1B
+
+set protocols static route 10.2.2.0/24 next-hop 10.1.1.10
+
+set load-balancing wan interface-health eth1 nexthop 10.0.20.3
+set load-balancing wan interface-health eth2 nexthop 10.0.3.4
+set load-balancing wan rule 1 inbound-interface eth5
+set load-balancing wan rule 1 interface eth1 weight 1
+set load-balancing wan rule 1 interface eth2 weight 1
+set load-balancing wan sticky-connections inbound
+set load-balancing wan disable-source-nat
