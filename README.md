@@ -13,4 +13,4 @@
 -Segurança em Redes de Comunicações (SRC) <br>
 ### Opcional:
 -Redes e Sistemas Autónomos (RSA) <br>
--Engenharia e Gestão de Serviços <br>
+-Engenharia e Gestão de Serviços (EGS) <br>
