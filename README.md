@@ -1,4 +1,4 @@
-# 1º Ano de MECT na UA
+# MECT 1º Ano na UA
 ## 1º Semestre do 4º Ano
 -Arquiteturas de Alto Desempenho (AAD) [15] <br>
 -Informação e Codificação (IC) [17] <br>
