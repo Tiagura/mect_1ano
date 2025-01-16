@@ -1,5 +1,5 @@
 # MECT 1º Ano na UA
-## 1º Semestre do 4º Ano
+## 1º Semestre
 -Arquiteturas de Alto Desempenho (AAD) [15] <br>
 -Informação e Codificação (IC) [17] <br>
 -Comunicações Móveis (CM) [13] <br>
@@ -7,7 +7,7 @@
 -Arquiteturas de Comunicação (AC) [17] <br>
 -Sistemas Operativos em Tempo Real (SOTR) [14] <br>
 
-## 2º Semestre do 4º Ano
+## 2º Semestre
 -Sistemas Distribuidos (SD) [14] <br>
 -Arquiteturas para Sistemas Embutidos (ASE) [16] <br>
 -Segurança em Redes de Comunicações (SRC) [19] <br>
